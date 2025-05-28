@@ -6,7 +6,7 @@ Toma 2 jugadores(players).
   <li>Al terminar el tiempo o adivinar se intercambian los roles.</li>
   <li>La partida es al mejor de 3, en caso de empate se suma una ronda.</li>
 </ol>
-<h3>DESARROLLO</h3>
+<h3>PASOS</h3>
 <p> 
   Imprime en pantalla un Menu que detalla las reglas.<br>
   Player1 elije la categoria(animales u objetos).<br>
@@ -17,4 +17,24 @@ Toma 2 jugadores(players).
   <br>
   Player1 pasa a adivinar y Player2 pasa a dibujar la palabra dada.<br>
   Al finalizar se imprime en pantalla el ganador con su puntaje.<br>
+</p>
+<h3>DESARROLLO</h3>
+<p>
+  Printea menu
+  Pide input de categoria en VAR categoria:
+                                        1)Animales
+                                        2)Objetos
+  Recibe input en AL
+  Pasa AL a proc random:
+                - Genera numero random
+                - lo devuelve en al
+                - mov dl,al
+  Pasa AL a proc secpalabra
+                - Toma dl
+                - AL = 1 -> "animales.txt"
+                - AL = 2 -> "objetos.txt"
+                - Abre dir
+                - Selecciona del .txt con input random() una plabra
+                - Devuelve palabra en VAR palabra
+          
 </p>
