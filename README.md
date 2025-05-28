@@ -29,6 +29,7 @@ DESARROLLO
                 - Genera numero random
                 - lo devuelve en al
                 - mov dl,al
+                  
   Pasa AL a proc secpalabra
                 - Toma dl
                 - AL = 1 -> "animales.txt"
@@ -60,7 +61,7 @@ DESARROLLO
   El proceso se repite 3 veces, cada vez el rol de Player1 y Player2 se intercambian.
   Al final de programa llama proc ganador:
                                 - ingresa contadores por p1:bx y p2:cx
-                                - compara cual es mayor y devuelve en dx: 1 o 2
+                                - compara cual es mayor y devuelve en ax: 1 o 2
                                 - print cartel "GANADOR es PLAYER_(dx)"
   Finaliza el programa.
                  
