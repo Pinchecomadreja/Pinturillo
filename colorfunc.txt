@@ -1,0 +1,101 @@
+##  Ejemplo: Imprimir texto con color en 8086 ASM (TASM/MASM)
+
+```asm
+.model small
+.stack 100h
+
+.data
+mensaje db 'Texto en color usando ASM!', '$'
+
+.code
+start:
+    mov ax, @data
+    mov ds, ax
+
+    ; Posicionar el cursor (fila = 5, columna = 10)
+    mov ah, 02h         ; Función 2: posicionar cursor
+    mov bh, 0           ; Página de video
+    mov dh, 5           ; Fila
+    mov dl, 10          ; Columna
+    int 10h
+
+    ; Imprimir cada carácter con color (atributo)
+    lea si, mensaje
+
+siguiente:
+    lodsb              ; Cargar siguiente carácter en AL
+    cmp al, '$'        ; ¿Fin del mensaje?
+    je fin
+
+    ; Imprimir carácter con color (función 09h de INT 10h)
+    mov ah, 09h         ; Función: escribir carácter y atributo
+    mov bh, 0           ; Página de video
+    mov bl, 0Eh         ; Atributo: amarillo claro sobre negro
+    mov cx, 1           ; Repetir una vez
+    int 10h
+    jmp siguiente
+
+fin:
+    ; Esperar tecla para salir
+    mov ah, 00h
+    int 16h
+
+    ; Salir al DOS
+    mov ax, 4C00h
+    int 21h
+
+end start
+```
+
+---
+
+##  Colores para el atributo (`bl`)
+
+El color se define así:
+
+* Bits bajos: color del **texto**
+* Bits altos: color de **fondo**
+
+| Código | Color            |
+| ------ | ---------------- |
+| `0`    | Negro            |
+| `1`    | Azul             |
+| `2`    | Verde            |
+| `3`    | Cian             |
+| `4`    | Rojo             |
+| `5`    | Magenta          |
+| `6`    | Marrón           |
+| `7`    | Gris claro       |
+| `8`    | Gris oscuro      |
+| `9`    | Azul claro       |
+| `A`    | Verde claro      |
+| `B`    | Cian claro       |
+| `C`    | Rojo claro       |
+| `D`    | Magenta claro    |
+| `E`    | Amarillo claro   |
+| `F`    | Blanco brillante |
+
+Por ejemplo, `0Eh` es:
+
+* Fondo: 0 (negro)
+* Texto: E (amarillo claro)
+
+---
+
+##  Cómo compilar y probar
+
+1. Guarda el archivo como `color.asm`.
+2. Compílalo con TASM/MASM:
+
+   ```bash
+   tasm color.asm
+   tlink color.obj
+   ```
+3. Ejecuta en DOSBox:
+
+   ```bash
+   dosbox color.exe
+   ```
+
+---
+
