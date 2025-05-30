@@ -1,0 +1,10 @@
+PROC Pincel:
+  - Tamaño muy pequeño de la pantalla en relacion al tamaño del pincel
+  - No colores
+  add:
+  - colores
+  - rezize pantalla con la del DOS
+
+  
+  
+  
