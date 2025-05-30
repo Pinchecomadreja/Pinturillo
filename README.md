@@ -1,4 +1,4 @@
-<h1>PINTURILLO</h1>
+<h1>CARBONILLO</h1>
 <p>
   Toma 2 jugadores:
   <ul>
