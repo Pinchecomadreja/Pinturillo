@@ -1,0 +1,7 @@
+Tareas:
+- Corregir funcionalidad de PROC pincel y hacerlo viable [AGUS]
+- Buscar como integrar colores en la PROC pincel [CARO]
+- Integrar PROC dir txt() [ENZO]:
+      - proc debe tomar como parametro un numero desde PROC random()
+      - debe devolver en VAR palabra el animal/objeto 
+      - VAR palabra debe estar disponible para compararla luego 
