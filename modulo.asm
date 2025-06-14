@@ -17,6 +17,13 @@
 	yes		db "	1. SI                                           		      ",24h
 	no		db "	2. NO                                           		      ",24h
 ;-------------------------------------------------------------------------------------------
+;CARTELES PLAYERS VARS
+;-------------------------------------------------------------------------------------------
+	;RECIBE EN AL:1 PARA CARTEL PLY1
+	;RECIBE EN AL:2 PARA CARTEL PLY2
+	pl1	db	"			         SOLO PLAYER 1            	              ",24h
+	pl2	db	"			         SOLO PLAYER 2            	              ",24h
+;-------------------------------------------------------------------------------------------
 ;MODULO PINCEL VARS
 ;-------------------------------------------------------------------------------------------
    botones dw 00
@@ -41,6 +48,7 @@
 
 .code
 ;---DECLARO MODULO
+	public carteles
 	public leertxt
 	public semilla
 					; Obtiene ticks del sistema en DX
@@ -116,6 +124,124 @@
 		pop ax
 		ret 
 	cls endp
+
+	carteles proc
+		push dx
+
+		cmp al,'1'
+		je ctl1
+
+		cmp al,'2'
+		je ctl2
+
+	ctl1:
+	;---TOP LEFT
+		mov dl,0c9h
+		call printspecial
+
+	;---MEDIO
+		mov dx,offset linea
+		call print
+
+	;---TOP RIGHT
+		mov dl,0bbh
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print 
+
+	;---LAT IZQ
+		mov dl,0bah
+		call printspecial
+
+	;PLAYER 1
+		mov dx,offset pl1
+		call print
+
+	;---LAT DER
+		mov dl,0bah
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print
+
+	;---BOTM LEF
+		mov dl,0c8h
+		call printspecial
+
+	;---MEDIO
+		mov dx,offset linea
+		call print
+		
+	;---BOTM RIGHT
+		mov dl,0bch
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print
+
+	jmp finctl
+
+	ctl2:
+	;---TOP LEFT
+		mov dl,0c9h
+		call printspecial
+
+	;---MEDIO
+		mov dx,offset linea
+		call print
+
+	;---TOP RIGHT
+		mov dl,0bbh
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print 
+
+	;---LAT IZQ
+		mov dl,0bah
+		call printspecial
+
+	;PLAYER 2
+		mov dx,offset pl2
+		call print
+
+	;---LAT DER
+		mov dl,0bah
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print
+
+	;---BOTM LEF
+		mov dl,0c8h
+		call printspecial
+
+	;---MEDIO
+		mov dx,offset linea
+		call print
+		
+	;---BOTM RIGHT
+		mov dl,0bch
+		call printspecial
+
+	;---ENTER
+		mov dx,offset espacio
+		call print
+		
+	jmp finctl
+
+	finctl:
+		pop dx
+	ret
+	carteles endp
+
+
 
 ;---MODULO MENU---
 	men proc 

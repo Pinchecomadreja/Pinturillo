@@ -6,11 +6,25 @@
 	salida 	db "HAS SALIDO DEL JUEGO",0dh,0ah,24h
 .code
 ;---DECLARO LIBRERIA EXTERNA
+	extrn carteles:proc
+						;RECIBE EN AL NRO DE CARTEL A MOSTRAR
+						;IMPRIME CARTEL
 	extrn leertxt:proc
+						;RECIBE EN AL NRO DE PALABRA A BUSCAR
+						;LEE ARCHIVO DE DIC.TXT
+						;IMPRIME PALABRA EN INDEX[NRO]
 	extrn men:proc
+						;RECIBE INPUT POR STACK
+						;IMPRIME MENU
+						;INTERACCION INTERNA EN AL
+						;1.CONTINUAR (SI)
+						;2.SALIR (NO)
 	extrn cls:proc
+						;LIMPIA LA PANTALLA
 	extrn print:proc
+						;IMPRIME VARS
 	extrn pincel:proc
+						;IMPRIME ESPECIAL VARS
 
 	main proc
 
@@ -34,8 +48,21 @@
 		je fin
 
 	op1:
-	;prueba de redireccion
-		call leertxt
+	;MUESTRA CARTEL PLAYER1
+		xor ax,ax
+
+		;IMPRIME CARTEL PLAYER1
+		mov al,'1'
+		call carteles
+
+		xor ax,ax
+		;PUT TIMER 5 SEG
+		call pincel
+
+		;IMPRIME CARTEL PLAYER1
+		;mov al,'2'
+		;call carteles
+
 	
 	fin:
 		call cls
