@@ -6,6 +6,7 @@
 	salida 	db "HAS SALIDO DEL JUEGO",0dh,0ah,24h
 .code
 ;---DECLARO LIBRERIA EXTERNA
+	extrn leertxt:proc
 	extrn men:proc
 	extrn cls:proc
 	extrn print:proc
@@ -34,10 +35,10 @@
 
 	op1:
 	;prueba de redireccion
-		call pincel
-
+		call leertxt
+	
 	fin:
-
+		call cls
 		mov ah,9
 		mov dx, offset salida
 		int 21h

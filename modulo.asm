@@ -2,6 +2,9 @@
 .model small
 .stack 100h
 .data
+;-------------------------------------------------------------------------------------------
+;MODULO MENU VARS
+;-------------------------------------------------------------------------------------------
 	linea	db 77 dup(0cdh),24h
 	menu	db 	"					MENU            		      ",24h
 	espacio	db	"",0dh,0ah,24h
@@ -29,8 +32,19 @@
    maxML    dw 199
    maxPC    dw 80
    maxPL    dw 25
+;-------------------------------------------------------------------------------------------
+;MODULO LEER TXT VARS
+;-------------------------------------------------------------------------------------------
+ 	 filename db "dic.txt",24h
+    handle   dw 0
+    buffer   db 128 dup(0)    ; 128-byte buffer
+
 .code
 ;---DECLARO MODULO
+	public leertxt
+	public semilla
+					; Obtiene ticks del sistema en DX
+					; Retorna el valor en AX
 	public pincel
 	public printspecial
 			  ;recibe en dx offset imprimir
@@ -414,18 +428,19 @@
 	;**************************
 	     pincel proc
 
-	        mov ah, 0
-	        mov al, 03h 
-	        ;mov al, 12h ;ESTABA 03h 80x25 16 colores TEXTO
-	        int 10h
 
-	        mov ax, 1
-	        int 33h
+        mov ah, 0
+        mov al, 03h 
+        ;mov al, 12h ;ESTABA 03h 80x25 16 colores TEXTO
+        int 10h
 
-	        cmp ax, 0
-	        je fin2
+        mov ax, 1
+        int 33h
 
-	      jmp arriba2
+        cmp ax, 0
+        je fin2
+
+      jmp arriba2
 	fin2: jmp fin
 
 	arriba2:  mov botones,bx
@@ -561,8 +576,8 @@
 	      jmp arriba
 
 
-	fin: 
-		ret
+		fin: 
+			ret
 	    pincel endp
 
 	imprimirVideo proc
@@ -708,5 +723,52 @@
 	   pop bx 
 	 ret
 	posicionM endp
+
+	semilla proc
+	; Obtiene ticks del sistema en DX
+	; Retorna el valor en AX
+    mov ah, 00h
+    int 1Ah  
+
+    mov ax, dx
+    int 81h
+
+    ret
+	semilla endp
+
+
+   leertxt proc
+   	push ax 
+   	push dx
+    
+	    ; open the file
+	    mov ah, 3dh    ; service 3d - open file
+	    mov al, 0       ; read-only mode
+	    mov dx,offset filename
+	    int 21h
+	    mov [handle], ax  ; save the file handle
+
+	    ; read the file into buffer
+	    mov ah, 3fh    ; service 3f - read from file
+	    mov bx, [handle]
+	    mov cx, 4096     ; read up to 4096 bytes
+	    mov dx,offset buffer
+	    int 21h
+
+	    ; print the buffer to the console
+	    mov dx,offset buffer  ; making sure it actually prints buffer
+	    mov ah, 9      ; service 9 - print string
+	    int 21h
+
+	    ; close the file
+	    mov ah,3eh  ; service 3e - close file
+	    mov bx, [handle]
+	    int 21h
+
+		pop dx
+		pop ax
+
+	ret 
+   leertxt endp
 
 end
