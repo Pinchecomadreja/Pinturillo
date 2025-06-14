@@ -8,6 +8,8 @@
 ;---DECLARO LIBRERIA EXTERNA
 	extrn men:proc
 	extrn cls:proc
+	extrn print:proc
+	extrn pincel:proc
 
 	main proc
 
@@ -21,42 +23,28 @@
 	call men
 
 	lea bx,input
+	call cls
 
 	opciones:
 		cmp byte ptr[bx],'1'
-		je sigue
+		je op1
 
 		cmp byte ptr[bx],'2'
-		je salir
+		je fin
 
-	
-
-	sigue:
+	op1:
 	;prueba de redireccion
-		mov ah,2
-		mov dl,24h
+		call pincel
+
+	fin:
+
+		mov ah,9
+		mov dx, offset salida
 		int 21h
-
-
-
-	salir:
 		
-		mov dx,offset salida	
-		call print
-
 		mov ah,4ch
 		int 21h
-		
+
 	main endp
-;---------------------------
-	print proc
-	push ax
-
-	mov ah,9
-	int 21h
-
-	pop ax
-	ret
-	print endp
 
 end
