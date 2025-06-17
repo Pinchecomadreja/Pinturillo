@@ -178,27 +178,25 @@ main endp
 ;------------------------------------------------------------------------------------------------------------------------------------------------
 ;procs!
 
-; lee lo que escribe el usuario 
 leer_respuesta_mejorada proc
     push bx
     push cx
     push dx
     
-    mov bx, offset input_adivinar  ; guardo la palabra escrita
+    mov bx, offset input_adivinar  ; Buffer para almacenar
     xor cx, cx                    ; Contador de caracteres = 0
 
 lectura:
     ; Leer tecla
     mov ah, 0
-    int 16h ; Espera a que el usuario presione una tecla (resultado en AL)
+    int 16h
     
-    cmp al, 0Dh;Si el usuario presiona Enter (código ASCII 0Dh), termina el ingreso.      
+    cmp al, 0Dh      
     je fin_lectura
     
     cmp al, 8        ; ¿Es Backspace?
     je manejar_backspace
-    ;Si presiona Backspace, salta al manejo especial para borrar el carácter anterior.
-
+    
     ;  esto es para el limite del buffer
     cmp cx, 19       ; 20-1 para el '$'
     jae lectura
@@ -211,21 +209,21 @@ lectura:
     sub al, 32
     
 no_convertir:
-    mov [bx], al   ; Guarda el carácter en el buffer
-    inc bx         ; Avanza el puntero
-    inc cx         ; Aumenta el contador
-    mov dl, al     ; DL = carácter
+    mov [bx], al
+    inc bx
+    inc cx
+    mov dl, al
     mov ah, 2
-    int 21h        ; Muestra el carácter en pantalla
+    int 21h
     jmp lectura
 
-manejar_backspace:;Borra el carácter anterior del buffer y también lo borra visualmente en pantalla.
+manejar_backspace:
     cmp cx, 0
     je lectura
     dec bx
     dec cx
 
-    mov dl, 8; Retrocede el cursor
+    mov dl, 8
     mov ah, 2
     int 21h
     mov dl, 20h
@@ -256,9 +254,6 @@ leer_opcion proc
     ret
 leer_opcion endp
 ;------------------------------------------------------------------------------------------------------------------------------------------------
-;Compara si la palabra ingresada por el usuario (input_adivinar)
-;coincide con el animal actualmente seleccionado (animal_actual).
-
 comparar_respuesta proc
     push si
     push di
@@ -271,7 +266,7 @@ comparar_respuesta proc
     ; Inicializar resultado (0 = incorrecto, 1 = correcto)
     xor bx, bx  ; BX = 0 (incorrecto por defecto)
     
-    ;Compara caracter por caracter:
+    ; Compara
     mov si, offset animal_actual
     mov di, offset input_adivinar
     
@@ -291,9 +286,9 @@ comparar:
 
 verificar_fin:
     cmp byte ptr [di], 24h
-    jne no_igual 
+    jne no_igual
     ;es correcto
-    mov bx, 1  ; BX = 1 (correcto);Si ambas terminan en $ al mismo tiempo, pone BX = 1 (correcto).
+    mov bx, 1  ; BX = 1 (correcto)
     jmp fin_comparacion
 
 no_igual:
@@ -309,8 +304,6 @@ fin_comparacion:
     ret
 comparar_respuesta endp
 ;------------------------------------------------------------------------------------------------------------------------------------------------
-;"Limpiar el final de una línea"
-
 limpiar_string proc
     push si
 buscar_fin:
@@ -331,6 +324,26 @@ fin_limpieza:
     pop si
     ret
 limpiar_string endp
+
+;-----------------------------------------------------------
+; strlen - Calcula la longitud de un string terminado en $
+; Entrada: DI = puntero al string
+; Salida: AX = longitud
+; Modifica: AX, DI
+;-----------------------------------------------------------
+strlen proc
+    push di
+    xor ax, ax
+contar:
+    cmp byte ptr [di], 24h
+    je fin_strlen
+    inc ax
+    inc di
+    jmp contar
+fin_strlen:
+    pop di
+    ret
+strlen endp
 
 ;-----------------------------------------------------------
 ; CargarAnimales - Carga la lista de animales desde archivo
