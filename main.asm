@@ -326,26 +326,6 @@ fin_limpieza:
 limpiar_string endp
 
 ;-----------------------------------------------------------
-; strlen - Calcula la longitud de un string terminado en $
-; Entrada: DI = puntero al string
-; Salida: AX = longitud
-; Modifica: AX, DI
-;-----------------------------------------------------------
-strlen proc
-    push di
-    xor ax, ax
-contar:
-    cmp byte ptr [di], 24h
-    je fin_strlen
-    inc ax
-    inc di
-    jmp contar
-fin_strlen:
-    pop di
-    ret
-strlen endp
-
-;-----------------------------------------------------------
 ; CargarAnimales - Carga la lista de animales desde archivo
 ; Modifica: AX, BX, CX, DX, SI
 ;-----------------------------------------------------------
