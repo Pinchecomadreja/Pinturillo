@@ -30,15 +30,16 @@
    botonesT db "00000",24h
    posX     db "00000", 24h
    posY     db "00000", 24h
+
    antX     dw 0
    antY     dw 0
-   ButtonL  db "Left        ",24h
-   ButtonR  db "Right       ",24h
-   ButtonN  db "Sin Botones ",24h
    maxMC    dw 639
    maxML    dw 199
    maxPC    dw 80
    maxPL    dw 25
+;-------TIMER INTERNO VARS--------
+   t_init   dw 0
+   t_set    dw 182
 ;-------------------------------------------------------------------------------------------
 ;MODULO LEER TXT VARS
 ;-------------------------------------------------------------------------------------------
@@ -48,6 +49,7 @@
 
 .code
 ;---DECLARO MODULO
+   public DelayTicks
 	public carteles
 	public leertxt
 	public semilla
@@ -125,6 +127,27 @@
 		ret 
 	cls endp
 
+	;-----------------------------------------------------------
+	; DelayTicks - Espera una cantidad específica de ticks
+	; Entrada: CX = Ticks a esperar
+	; Modifica: AX, BX, DX
+	;-----------------------------------------------------------
+	DelayTicks proc
+    	push bx
+    	mov ah, 00h
+    	int 1Ah            ; Obtener ticks iniciales en DX
+    	mov bx, dx  	       ; Guardar en BX
+    
+    	esperarTick:
+        	int 1Ah        ; Obtener ticks actuales
+        	sub dx, bx     ; Calcular diferencia
+        	cmp dx, cx     ; Comparar con tiempo deseado
+        jb esperarTick     ; Seguir esperando si no ha pasado
+    
+   	 pop bx
+   ret
+	DelayTicks endp
+	
 	carteles proc
 		push dx
 
@@ -554,6 +577,13 @@
 	;**************************
 	     pincel proc
 
+	     push bx
+	     push dx
+
+	     mov ah, 00h
+    	  int 1Ah            ; Obtener ticks iniciales en DX
+    	  mov t_init, dx     ; Guardar en BX
+    	  
 
         mov ah, 0
         mov al, 03h 
@@ -569,27 +599,42 @@
       jmp arriba2
 	fin2: jmp fin
 
-	arriba2:  mov botones,bx
+	arriba2:  
+		mov botones,bx
 	arriba: 
+
+;--------------------------------------------------------------------
+
+     	int 1Ah        	; Obtener ticks actuales
+     	sub dx, t_init     ; Calcular diferencia
+     	cmp dx, t_set  	; Comparar con tiempo deseado
+     	je fin2    			; Seguir esperando si no ha pasado
+;--------------------------------------------------------------------
+
+
 
 	         in al, 60h
 	         cmp al, 1
 	         je fin2
 	         
+	         ;POSICION DEL MOUSE
 	         mov ax, 3
 	         int 33h
-	         push cx
-	         push dx
 
+	         ;PASA AL STACK COORDENADAS
+	         push cx; EJE X
+	         push dx; EJE Y
+
+	         ;BX->0 = NADA
 	         cmp bx, 0
 	         je nada
+	         ;BX->1 = LEFT CLICK
 	         cmp bx, 1
 	         je left
 	         
 	         push si
 	         push dx
 	         push bx
-	         mov si, offset ButtonR
 	         mov dl, 1
 	         mov dh, 22
 	         mov bl, 15 
@@ -610,36 +655,15 @@
 	         pop si
 	         jmp cont
 	nada: 
-	         push si
-	         push dx
-	         push bx
-	         mov si, offset ButtonN
-	         mov dl, 1
-	         mov dh, 22
-	         mov bl, 15 
-	         call imprimirVideo
-
-	         pop bx
-	         pop dx
-	         pop si
 	         jmp cont
 	left:
-	         push si
-	         push dx
-	         push bx
-	         mov si, offset ButtonL
-	         mov dl, 1
-	         mov dh, 22
-	         mov bl, 15 
-	         call imprimirVideo
-
-	         pop bx
-	         pop dx
-	         pop si
-
-	         mov cx, antY
-	         mov bx, antX
+				;PASA COORDENADAS DE DONDE TIENE QUE IMPRIMIR EL MOUSE
+	         mov cx, antY;0
+	         mov bx, antX;0
 	         call posicionM
+
+	         ;PASA BL COLOR
+	         ;PASA AL CODEC CHAR
 	         mov bl, 19
 	         mov al, 219
 	         call imprimirCaracter 
@@ -650,23 +674,26 @@
 
 
 	cont:         
-	      pop cx
+	      pop cx;EJE X MOUSE
 	      cmp cx, antX
 	      je otro
 	         mov antX, cx
 	         xor ax, ax
 
 
-	         mov si, offset posX
+	         mov si, offset posX;ACA DEBERIA IR EL CONTADOR
 	         call regToAscii16
 
 	         push si
 	         push dx
 	         push bx
-	         mov si, offset posX
-	         mov dl, 1
-	         mov dh, 23
-	         mov bl, 10 
+
+	       ;MUEVE TEXTO Y PASA EN DX POSICION EN PANTALLA PARA IMPRIMIR
+
+	         ;mov si, offset posX;TEXTO A IMRIMIR
+	         mov dl, 1;COLUMNA
+	         mov dh, 23;FILA
+	         mov bl, 10;COLOR
 	         call imprimirVideo
 
 	         pop bx
@@ -683,26 +710,12 @@
 	sige:    
 	         mov anty, dx
 	         mov cx, dx
-	         mov si, offset posY
-	         call regToAscii16
-
-	         push si
-	         push dx
-	         push bx
-	         mov si, offset posY
-	         mov dl, 1
-	         mov dh, 24
-	         mov bl, 10 
-	         call imprimirVideo
-
-	         pop bx
-	         pop dx
-	         pop si
 
 	      jmp arriba
 
 
-		fin: 
+		fin:
+			call cls
 			ret
 	    pincel endp
 
@@ -826,7 +839,7 @@
 
 	posicionM proc
 	   ;este programa recibe en CX columna y en BX fila de la posición del mouse en pantalla
-	   ; devuelve en DX LA POSICIÓN de la pantalla DONDE estaría
+	   ;devuelve en DX LA POSICIÓN de la pantalla DONDE estaría
 
 	   push bx
 	   push ax
@@ -896,5 +909,4 @@
 
 	ret 
    leertxt endp
-
 end
