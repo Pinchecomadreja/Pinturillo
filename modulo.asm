@@ -13,9 +13,9 @@
 	ln3		db "	3. TENDRA 60 SEGUNDOS POR RONDAS				      ",24h
 	ln4		db "	4. GANA EL JUGADOR CON MAS RONDAS CORRECTAS      	              ",24h
 	ln5		db "	5. RONDAS AL MEJOR DE 3                                               ",24h
-	incio	db "		           CONFIRMAR INICIO:            		      ",24h
+	incio		db "		           CONFIRMAR INICIO:            		      ",24h
 	yes		db "	1. SI                                           		      ",24h
-	no		db "	2. NO                                           		      ",24h
+	no			db "	2. NO                                           		      ",24h
 ;-------------------------------------------------------------------------------------------
 ;CARTELES PLAYERS VARS
 ;-------------------------------------------------------------------------------------------
@@ -40,6 +40,7 @@
 ;-------TIMER INTERNO VARS--------
    t_init   dw 0
    t_set    dw 182
+   t_ascii	db '00000',24h
 ;-------------------------------------------------------------------------------------------
 ;MODULO LEER TXT VARS
 ;-------------------------------------------------------------------------------------------
@@ -607,6 +608,21 @@
 
      	int 1Ah        	; Obtener ticks actuales
      	sub dx, t_init     ; Calcular diferencia
+
+     	push dx;LO DEJO PARA DESPUES
+     	
+     	mov cx,dx;PASO NRO POR CX
+     	mov si,offset t_ascii;PASO VAR OFFSET POR SI
+     	call regToAscii16;LLAMO REGTOASCII
+
+     	;[si<-offset t_ascii ]IMPRIMIR VIDEO
+      mov dl, 1;COLUMNA
+      mov dh, 23;FILA
+      mov bl, 10;COLOR
+      call imprimirVideo
+
+     	pop dx;LO TRAIGO Y USO ACA
+
      	cmp dx, t_set  	; Comparar con tiempo deseado
      	je fin2    			; Seguir esperando si no ha pasado
 ;--------------------------------------------------------------------
@@ -635,10 +651,7 @@
 	         push si
 	         push dx
 	         push bx
-	         mov dl, 1
-	         mov dh, 22
-	         mov bl, 15 
-	         call imprimirVideo
+	        
 
 	         mov cx, antY
 	         mov bx, antX
@@ -666,7 +679,7 @@
 	         ;PASA AL CODEC CHAR
 	         mov bl, 19
 	         mov al, 219
-	         call imprimirCaracter 
+	        	call imprimirCaracter 
 	         ;RECIBE EN AL el CARACTER a IMPRIMIR en DH y DL donde debe imprimir
 	         ;EN BL el color
 
@@ -679,27 +692,6 @@
 	      je otro
 	         mov antX, cx
 	         xor ax, ax
-
-
-	         mov si, offset posX;ACA DEBERIA IR EL CONTADOR
-	         call regToAscii16
-
-	         push si
-	         push dx
-	         push bx
-
-	       ;MUEVE TEXTO Y PASA EN DX POSICION EN PANTALLA PARA IMPRIMIR
-
-	         ;mov si, offset posX;TEXTO A IMRIMIR
-	         mov dl, 1;COLUMNA
-	         mov dh, 23;FILA
-	         mov bl, 10;COLOR
-	         call imprimirVideo
-
-	         pop bx
-	         pop dx
-	         pop si
-
 	otro:    
 	         pop dx
 	         cmp dx, antY
